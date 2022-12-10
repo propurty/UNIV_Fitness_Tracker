@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
+const { createUser, getUser, getUserById, getUserByUsername } = require('../db/users')
+
 // POST /api/users/login
+
 
 // POST /api/users/register
 
