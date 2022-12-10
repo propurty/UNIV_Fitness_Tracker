@@ -1,5 +1,5 @@
 const client = require("./client");
-
+// Here to test if this works
 // database functions
 
 // user functions
