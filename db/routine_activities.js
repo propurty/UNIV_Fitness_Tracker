@@ -10,6 +10,7 @@ async function addActivityToRoutine({
 }) {}
 
 async function getRoutineActivitiesByRoutine({ id }) {}
+console.log("getroutines" getRoutineActivitiesByRoutine)
 
 async function updateRoutineActivity({ id, ...fields }) {}
 
