@@ -1,12 +1,12 @@
 const express = require('express');
-const router = express.Router();
+const usersRouter = express.Router();
 const jwt = require("jsonwebtoken");
 const {JWT_SECRET = 'bigSecret'} = process.env;
 
 const { createUser, getUser, getUserById, getUserByUsername, getPublicRoutinesByUser } = require('../db')
 
 // POST /api/users/login
-router.post("/login", async (req, res, next) => {
+usersRouter.post("/login", async (req, res, next) => {
     const { username, password } = req.body;
     try {
         if (!username || !password) {
@@ -35,7 +35,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 // POST /api/users/register
-router.post("/register", async (req, res, next) => {
+usersRouter.post("/register", async (req, res, next) => {
     const { username, password } = req.body;
     try {
         const_user = await getUserByUsername(username);
@@ -66,7 +66,7 @@ router.post("/register", async (req, res, next) => {
 });
 
 // GET /api/users/me
-router.get("/me", async (req, res, next) => {
+usersRouter.get("/me", async (req, res, next) => {
     if (!req.user) {
         next({
             name: "missingUser",
@@ -78,7 +78,7 @@ router.get("/me", async (req, res, next) => {
 });
 
 // GET /api/users/:username/routines
-router.get("/:username/routines", async(req, res, next) => {
+usersRouter.get("/:username/routines", async(req, res, next) => {
     const { username } = req.params
     try {
         const routines = await getPublicRoutinesByUser({username});
