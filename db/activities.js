@@ -19,7 +19,7 @@ async function getActivityById(id) {
     const { rows:[activity] } = await client.query (`
       SELECT *
       FROM activities
-      WHERE id=$1
+      WHERE id=$1;
     `, [id]);
     return activity;
   } catch (error) {
@@ -32,7 +32,7 @@ async function getActivityByName(name) {
     const { rows:[activity] } = await client.query (`
       SELECT *
       FROM activites
-      WHERE name=$1
+      WHERE name=$1;
     `, [name]);
     return activity;
   } catch (error) {
@@ -46,7 +46,7 @@ async function attachActivitiesToRoutines(routines) {
     const { rows:[activity] } = await client.query(`
       INSERT INTO activities(routines)
       VALUES $1
-      RETURNING *
+      RETURNING *;
     `, [routines]);
     return activity;    
   } catch (error) {
@@ -61,7 +61,7 @@ async function createActivity({ name, description }) {
     const { rows:[activity] } = await client.query(`
       INSERT INTO activities(name, description)
       VALUES ($1, $2)
-      RETURNING *
+      RETURNING *;
     `, [name, description]);
 
   return activity;
@@ -80,7 +80,7 @@ async function updateActivity({ id, name, description }) {
       UPDATE activites
       SET name=$1, description=$2
       WHERE id=$3
-      RETURNING *
+      RETURNING *;
     `, [name, description, id]);
     return activity;
   } catch (error) {
