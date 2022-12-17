@@ -52,12 +52,12 @@ async function destroyRoutineActivity(id) {
   return routine_activity
 }
 
-async function canEditRoutineActivity(routineActivityId, userId) {
-  const { rows:[routine_activity] } = await client.query (`
+//async function canEditRoutineActivity(routineActivityId, userId) {
+ // const { rows:[routine_activity] } = await client.query (`
 
   
-  `)
-}
+ // `)
+//}
 
 module.exports = {
   client,
@@ -66,5 +66,5 @@ module.exports = {
   getRoutineActivitiesByRoutine,
   updateRoutineActivity,
   destroyRoutineActivity,
-  canEditRoutineActivity,
+  //canEditRoutineActivity,
 };
