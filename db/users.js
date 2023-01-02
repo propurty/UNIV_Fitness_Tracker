@@ -1,23 +1,27 @@
 const client = require("./client");
 const bcrypt = require("bcrypt");
-
+const SALT_COUNT = 10;
 
 // user functions
 async function createUser({ username, password }) {
-  const SALT_COUNT = 10;
   const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
   try {
-    const { rows: [ user ]} = await client.query(`
-      INSERT INTO users (username, passsword)
+    const {
+      rows: [user],
+    } = await client.query(
+      `
+      INSERT INTO users (username, password)
       VALUES ($1, $2)
       ON CONFLICT (username) DO NOTHING
-      RETURNING *
-    `, [username, hashedPassword]);
+      RETURNING *;
+    `,
+      [username, hashedPassword]
+    );
 
     delete user.password;
     return user;
   } catch (error) {
-    console.error("Error in createUser")
+    console.error("Error in createUser");
     throw error;
   }
 }
@@ -35,30 +39,40 @@ async function getUser({ username, password }) {
 
 async function getUserById(userId) {
   try {
-    const {rows: [user]} = await client.query(`
+    const {
+      rows: [user],
+    } = await client.query(
+      `
       SELECT *
       FROM users
-      WHERE id = $1;
-    `, [userId]);
+      WHERE id=$1;
+    `,
+      [userId]
+    );
 
     return user;
   } catch (error) {
-    console.error("Error in getUserById")
+    console.error("Error in getUserById");
     throw error;
   }
 }
 
 async function getUserByUsername(userName) {
   try {
-    const {rows: [user]} = await client.query(`
+    const {
+      rows: [user],
+    } = await client.query(
+      `
       SELECT *
       FROM users
       WHERE username=$1;
-    `, [userName]);
+    `,
+      [userName]
+    );
 
     return user;
   } catch (error) {
-    console.error("Error in getUserByUsername")
+    console.error("Error in getUserByUsername");
     throw error;
   }
 }

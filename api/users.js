@@ -1,9 +1,9 @@
 const express = require('express');
 const usersRouter = express.Router();
 const jwt = require("jsonwebtoken");
-const {JWT_SECRET = 'bigSecret'} = process.env;
+const {JWT_SECRET = 'neverTell'} = process.env;
 
-const { createUser, getUser, getUserById, getUserByUsername, getPublicRoutinesByUser } = require('../db')
+const { createUser, getUser, getUserByUsername, getPublicRoutinesByUser } = require('../db')
 
 // POST /api/users/login
 usersRouter.post("/login", async (req, res, next) => {
@@ -27,7 +27,7 @@ usersRouter.post("/login", async (req, res, next) => {
                 id: user.id,
                 username: user.username
             }, JWT_SECRET);
-            res.send({ user, message: "Thank you for signing up", token: token});
+            res.send({ message: "Thank you for signing up", user: user, token: token});
         }
     } catch ({ name, message }) {
         next({name, message});
@@ -36,9 +36,10 @@ usersRouter.post("/login", async (req, res, next) => {
 
 // POST /api/users/register
 usersRouter.post("/register", async (req, res, next) => {
-    const { username, password } = req.body;
+    
     try {
-        const_user = await getUserByUsername(username);
+      const { username, password } = req.body;
+      const _user = await getUserByUsername(username);
         if (_user)
  {
     next({
@@ -68,6 +69,7 @@ usersRouter.post("/register", async (req, res, next) => {
 // GET /api/users/me
 usersRouter.get("/me", async (req, res, next) => {
     if (!req.user) {
+        res.status(401)
         next({
             name: "missingUser",
             message: "You must be logged in"
@@ -88,4 +90,4 @@ usersRouter.get("/:username/routines", async(req, res, next) => {
     }
 });
 
-module.exports = router;
+module.exports = usersRouter;
