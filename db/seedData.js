@@ -1,36 +1,14 @@
-// NOTE - Make sure to uncomment the database adapter functions as you write them (createUser, createActivity...)
-// You can uncomment them all to make testing easier and it shouldn't break anything, but you'll get a lot of errors in VSCode for the functions not written. - PIERCE
 const {
   // -------------------------------- * Users *
   createUser,
-  // getUser,
-  // getUserById,
-  // getUserByUsername,
   // -------------------------------- * Routines *
-  // getRoutineById,
   getRoutinesWithoutActivities,
-  // getAllRoutines,
-  // getAllPublicRoutines,
-  // getAllRoutinesByUser,
-  // getPublicRoutinesByUser,
-  // getPublicRoutinesByActivity,
   createRoutine,
-  // updateRoutine,
-  // destroyRoutine,
   // -------------------------------- * Activities *
   getAllActivities,
-  // getActivityById,
-  // getActivityByName,
-  // attachActivitiesToRoutines,
   createActivity,
-  // updateActivity,
   // -------------------------------- * Routine Activities *
-  // getRoutineActivityById,
   addActivityToRoutine,
-  // getRoutineActivitiesByRoutine,
-  // updateRoutineActivity,
-  // destroyRoutineActivity,
-  // canEditRoutineActivity,
 } = require("./index");
 
 const client = require("./client");
@@ -51,11 +29,14 @@ async function dropTables() {
   }
 }
 
+// TODO routine_activities
+// JOIN, WITH ITS OWN DATA
+// We saw joins before, but these now have additional information attached to them. This is a great use of a join table, and you can see immediately the type of use we get out of it.
 async function createTables() {
   // create all tables, in the correct order
   try {
     console.log("Starting to build tables...");
-    await client.query(`
+    await client.query(`--sql
       CREATE TABLE users (
         id SERIAL PRIMARY KEY,
         username VARCHAR(255) UNIQUE NOT NULL,
@@ -70,18 +51,19 @@ async function createTables() {
 
       CREATE TABLE routines (	
         id SERIAL PRIMARY KEY,
-        "creatorId"	INTEGER	REFERENCES users(id),
+        "creatorId"	INTEGER	REFERENCES users( id ),
         "isPublic" BOOLEAN DEFAULT false,
         name VARCHAR(255) UNIQUE NOT NULL,
         goal TEXT	NOT NULL
     );
 
-      CREATE TABLE routine_activities (	
-        id	SERIAL	PRIMARY KEY,
-        "routineId" INTEGER	 REFERENCES routines(id) UNIQUE,
-        "activityId" INTEGER	REFERENCES activities(id) UNIQUE,
+      CREATE TABLE routine_activities (
+        id SERIAL PRIMARY KEY,
+        "routineId"	INTEGER	REFERENCES routines ( id ),
+        "activityId"	INTEGER	REFERENCES activities ( id ),
         duration	INTEGER,
-        count	INTEGER
+        count	INTEGER,
+        UNIQUE ("routineId", "activityId")
     );
   `);
 

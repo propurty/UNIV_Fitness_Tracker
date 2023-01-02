@@ -9,7 +9,7 @@ async function getAllActivities() {
     `);
     return rows;
   } catch (error) {
-    console.error(error);
+    console.error("Error in getAllActivities");
     throw error;
   }
 }
@@ -23,7 +23,7 @@ async function getActivityById(id) {
     `, [id]);
     return activity;
   } catch (error) {
-    console.error(error)
+    console.error("Error in getActivityById")
     throw error;
   }
 }
@@ -37,7 +37,7 @@ async function getActivityByName(name) {
     `, [name]);
     return activity;
   } catch (error) {
-    console.error(error)
+    console.error("Error in getActivityByName")
     throw error;
   }
 }
@@ -48,11 +48,11 @@ async function attachActivitiesToRoutines(routines) {
     const { rows:[activity] } = await client.query(`
       INSERT INTO activities(routines)
       VALUES $1
-      RETURNING *
+      RETURNING *;
     `, [routines]);
     return activity;    
   } catch (error) {
-    console.error(error);
+    console.error("Error in attachActivitiesToRoutines");
     throw error;
   }
 }
@@ -63,12 +63,12 @@ async function createActivity({ name, description }) {
     const { rows:[activity] } = await client.query(`
       INSERT INTO activities(name, description)
       VALUES ($1, $2)
-      RETURNING *
+      RETURNING *;
     `, [name, description]);
 
   return activity;
   } catch (error) {
-    console.error(error);
+    console.error("Error in createActivity");
     throw error;
   }
 }
@@ -86,7 +86,7 @@ async function updateActivity({ id, name, description }) {
     `, [name, description, id]);
     return activity;
   } catch (error) {
-    console.error(error)
+    console.error("Error in updateActivity")
     throw error;
   }
 }
