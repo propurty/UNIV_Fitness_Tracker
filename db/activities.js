@@ -9,7 +9,7 @@ async function getAllActivities() {
     `);
     return rows;
   } catch (error) {
-    console.error(error);
+    console.error("Error in getAllActivities");
     throw error;
   }
 }
@@ -23,6 +23,7 @@ async function getActivityById(id) {
     `, [id]);
     return activity;
   } catch (error) {
+    console.error("Error in getActivityById")
     throw error;
   }
 }
@@ -36,6 +37,7 @@ async function getActivityByName(name) {
     `, [name]);
     return activity;
   } catch (error) {
+    console.error("Error in getActivityByName")
     throw error;
   }
 }
@@ -50,7 +52,7 @@ async function attachActivitiesToRoutines(routines) {
     `, [routines]);
     return activity;    
   } catch (error) {
-    console.error(error);
+    console.error("Error in attachActivitiesToRoutines");
     throw error;
   }
 }
@@ -66,7 +68,7 @@ async function createActivity({ name, description }) {
 
   return activity;
   } catch (error) {
-    console.error(error);
+    console.error("Error in createActivity");
     throw error;
   }
 }
@@ -84,6 +86,7 @@ async function updateActivity({ id, name, description }) {
     `, [name, description, id]);
     return activity;
   } catch (error) {
+    console.error("Error in updateActivity")
     throw error;
   }
 }

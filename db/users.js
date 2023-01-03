@@ -17,7 +17,8 @@ async function createUser({ username, password }) {
     delete user.password;
     return user;
   } catch (error) {
-    console.log("There was an error creating user")
+    console.error("Error in createUser")
+    throw error;
   }
 }
 
@@ -42,7 +43,7 @@ async function getUserById(userId) {
 
     return user;
   } catch (error) {
-    console.log("There was an error getting user by ID")
+    console.error("Error in getUserById")
     throw error;
   }
 }
@@ -57,7 +58,7 @@ async function getUserByUsername(userName) {
 
     return user;
   } catch (error) {
-    console.log("There was an error getting user by username")
+    console.error("Error in getUserByUsername")
     throw error;
   }
 }
