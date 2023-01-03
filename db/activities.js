@@ -16,28 +16,38 @@ async function getAllActivities() {
 
 async function getActivityById(id) {
   try {
-    const { rows:[activity] } = await client.query (`
+    const {
+      rows: [activity],
+    } = await client.query(
+      `
       SELECT *
       FROM activities
       WHERE id=$1;
-    `, [id]);
+    `,
+      [id]
+    );
     return activity;
   } catch (error) {
-    console.error("Error in getActivityById")
+    console.error("Error in getActivityById");
     throw error;
   }
 }
 
 async function getActivityByName(name) {
   try {
-    const { rows:[activity] } = await client.query (`
+    const {
+      rows: [activity],
+    } = await client.query(
+      `
       SELECT *
-      FROM activites
+      FROM activities
       WHERE name=$1;
-    `, [name]);
+    `,
+      [name]
+    );
     return activity;
   } catch (error) {
-    console.error("Error in getActivityByName")
+    console.error("Error in getActivityByName");
     throw error;
   }
 }
@@ -45,12 +55,17 @@ async function getActivityByName(name) {
 // select and return an array of all activities
 async function attachActivitiesToRoutines(routines) {
   try {
-    const { rows:[activity] } = await client.query(`
+    const {
+      rows: [activity],
+    } = await client.query(
+      `
       INSERT INTO activities(routines)
       VALUES $1
       RETURNING *;
-    `, [routines]);
-    return activity;    
+    `,
+      [routines]
+    );
+    return activity;
   } catch (error) {
     console.error("Error in attachActivitiesToRoutines");
     throw error;
@@ -60,13 +75,18 @@ async function attachActivitiesToRoutines(routines) {
 // return the new activity
 async function createActivity({ name, description }) {
   try {
-    const { rows:[activity] } = await client.query(`
+    const {
+      rows: [activity],
+    } = await client.query(
+      `
       INSERT INTO activities(name, description)
       VALUES ($1, $2)
       RETURNING *;
-    `, [name, description]);
+    `,
+      [name, description]
+    );
 
-  return activity;
+    return activity;
   } catch (error) {
     console.error("Error in createActivity");
     throw error;
@@ -76,17 +96,25 @@ async function createActivity({ name, description }) {
 // don't try to update the id
 // do update the name and description
 // return the updated activity
+// Updates name without affecting the ID. Returns the updated Activity.
+// Updates description without affecting the ID. Returns the updated Activity.
 async function updateActivity({ id, name, description }) {
   try {
-    const { rows:[activity] } = await client.query (`
-      UPDATE activites
-      SET name=$1, description=$2
-      WHERE id=$3
-      RETURNING *;
-    `, [name, description, id]);
+    const {
+      rows: [activity],
+    } = await client.query(
+      `
+      UPDATE activities
+      SET name=$2, description=$3
+      WHERE id=$1
+      RETURNING *
+    `,
+      [id, name, description]
+    );
+
     return activity;
   } catch (error) {
-    console.error("Error in updateActivity")
+    console.error("Error in updateActivity");
     throw error;
   }
 }
