@@ -2,6 +2,7 @@ const client = require("./client");
 const bcrypt = require("bcrypt");
 const SALT_COUNT = 10;
 
+
 // user functions
 // make sure to hash the password before storing it to the database
 async function createUser({ username, password }) {
