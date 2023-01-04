@@ -106,11 +106,26 @@ async function destroyRoutineActivity(id) {
   }
 }
 
-//async function canEditRoutineActivity(routineActivityId, userId) {
-// const { rows:[routine_activity] } = await client.query (`
-
-// `)
-//}
+async function canEditRoutineActivity(routineActivityId, userId) {
+  try{
+    const {rows :users} = await client.query(`
+    SELECT * FROM users
+    INNER JOIN routines
+    ON ${userId} = routines."creatorId"
+    INNER JOIN routine_activities
+    ON routines.id = routine_activities."routineId"
+  `)
+  if (users[0]){
+    return true
+  }else {
+    return false
+  }
+  }catch (error) {
+    console.log ("Error in deleteRoutine")
+    throw error;
+  
+  }
+  }
 
 module.exports = {
   client,
