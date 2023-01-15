@@ -1,6 +1,5 @@
 const client = require("./client");
 
-// database functions
 async function getAllActivities() {
   try {
     const { rows } = await client.query(`
@@ -52,27 +51,30 @@ async function getActivityByName(name) {
   }
 }
 
-// select and return an array of all activities
 async function attachActivitiesToRoutines(routines) {
+  const routinesToReturn = [...routines];
+
   try {
-    const {
-      rows: [activity],
-    } = await client.query(
-      `
-      INSERT INTO activities(routines)
-      VALUES $1
-      RETURNING *;
-    `,
-      [routines]
-    );
-    return activity;
+    const { rows: activities } = await client.query(`
+    SELECT activities.*, routine_activities.id AS "routineActivityId", routine_activities."routineId", 
+    routine_activities.duration, routine_activities.count
+    FROM activities
+    JOIN routine_activities ON routine_activities."activityId" = activities.id;
+    `);
+
+    for (const routine of routinesToReturn) {
+      const activitiesToAdd = activities.filter(
+        (activity) => activity.routineId === routine.id
+      );
+      routine.activities = activitiesToAdd;
+    }
+
+    return routinesToReturn;
   } catch (error) {
-    console.error("Error in attachActivitiesToRoutines");
-    throw error;
+    console.error(error);
   }
 }
 
-// return the new activity
 async function createActivity({ name, description }) {
   try {
     const {
@@ -93,23 +95,26 @@ async function createActivity({ name, description }) {
   }
 }
 
-// don't try to update the id
-// do update the name and description
-// return the updated activity
-// Updates name without affecting the ID. Returns the updated Activity.
-// Updates description without affecting the ID. Returns the updated Activity.
-async function updateActivity({ id, name, description }) {
+async function updateActivity({ id, ...fields }) {
+  const setString = Object.keys(fields)
+    .map((key, index) => `"${key}"=$${index + 1}`)
+    .join(", ");
+
+  if (setString.length === 0) {
+    return;
+  }
+
   try {
     const {
       rows: [activity],
     } = await client.query(
       `
       UPDATE activities
-      SET name=$2, description=$3
-      WHERE id=$1
-      RETURNING *
+      SET ${setString}
+      WHERE id=${id}
+      RETURNING *;
     `,
-      [id, name, description]
+      Object.values(fields)
     );
 
     return activity;
