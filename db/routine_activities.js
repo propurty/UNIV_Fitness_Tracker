@@ -1,6 +1,5 @@
 const client = require("./client");
 
-// return the routine_activity
 async function getRoutineActivityById(id) {
   try {
     const {
@@ -20,8 +19,6 @@ async function getRoutineActivityById(id) {
   }
 }
 
-// TODO create a new routine_activity, and return it
-// creates a new routine_activity, and returns it
 async function addActivityToRoutine({
   routineId,
   activityId,
@@ -46,13 +43,9 @@ async function addActivityToRoutine({
   }
 }
 
-// ! select and return an array of all routine_activity records
-// Should return the routine activities for a routine.
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
-    const {
-      rows: [routine_activity],
-    } = await client.query(
+    const { rows: routine_activities } = await client.query(
       `
       SELECT *
       FROM routine_activities
@@ -60,7 +53,7 @@ async function getRoutineActivitiesByRoutine({ id }) {
     `,
       [id]
     );
-    return routine_activity;
+    return routine_activities;
   } catch (error) {
     console.error("Error in getRoutineActivitiesByRoutine");
     throw error;
@@ -106,11 +99,22 @@ async function destroyRoutineActivity(id) {
   }
 }
 
-//async function canEditRoutineActivity(routineActivityId, userId) {
-// const { rows:[routine_activity] } = await client.query (`
+async function canEditRoutineActivity(routineActivityId, userId) {
+  try {
+    const { rows: users } = await client.query(`
+    SELECT * FROM users
+    INNER JOIN routines
+    ON ${userId} = routines."creatorId"
+    INNER JOIN routine_activities
+    ON routines.id = routine_activities."routineId"
+  `);
 
-// `)
-//}
+    return users[0] ? true : false;
+  } catch (error) {
+    console.log("Error in canEditRoutineActivity");
+    throw error;
+  }
+}
 
 module.exports = {
   client,
