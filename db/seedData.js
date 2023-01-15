@@ -36,7 +36,7 @@ async function createTables() {
   // create all tables, in the correct order
   try {
     console.log("Starting to build tables...");
-    await client.query(`--sql
+    await client.query(`
       CREATE TABLE users (
         id SERIAL PRIMARY KEY,
         username VARCHAR(255) UNIQUE NOT NULL,
@@ -51,7 +51,7 @@ async function createTables() {
 
       CREATE TABLE routines (	
         id SERIAL PRIMARY KEY,
-        "creatorId"	INTEGER	REFERENCES users( id ),
+        "creatorId"	INTEGER	REFERENCES users(id),
         "isPublic" BOOLEAN DEFAULT false,
         name VARCHAR(255) UNIQUE NOT NULL,
         goal TEXT	NOT NULL
@@ -59,9 +59,9 @@ async function createTables() {
 
       CREATE TABLE routine_activities (
         id SERIAL PRIMARY KEY,
-        "routineId"	INTEGER	REFERENCES routines ( id ),
-        "activityId"	INTEGER	REFERENCES activities ( id ),
-        duration	INTEGER,
+        "routineId"	INTEGER	REFERENCES routines (id),
+        "activityId" INTEGER REFERENCES activities (id),
+        duration INTEGER,
         count	INTEGER,
         UNIQUE ("routineId", "activityId")
     );
