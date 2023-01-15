@@ -1,94 +1,102 @@
 const express = require("express");
 const routinesRouter = express.Router();
 const {
-  getAllPublicRoutines,
-  attachActivitiesToRoutines,
   createRoutine,
+  getRoutineById,
+  getAllRoutines,
   updateRoutine,
   destroyRoutine,
   addActivityToRoutine,
-} = require("../db/routines");
+} = require("../db");
 
-// Return a list of public routines, include the activities with them
 // GET /api/routines
-routinesRouter.get("/api/routines", async (req, res, next) => {
-  try {
-    const routines = await getAllPublicRoutines();
-    const routinesWithActivities = await attachActivitiesToRoutines(routines);
-    res.send(routinesWithActivities);
-  } catch (error) {
-    next(error);
-  }
+routinesRouter.get("/", async (req, res) => {
+  const allRoutines = await getAllRoutines();
+  res.send(allRoutines);
 });
 
-// Create a new routine
 // POST /api/routines
-routinesRouter.post("/api/routines", async (req, res, next) => {
+routinesRouter.post("/", async (req, res, next) => {
+  const { isPublic, name, goal } = req.body;
+  const { id } = req.user;
   try {
-    const { name, goal, isPublic } = req.body;
-    const { id: creatorId } = req.user;
-    const routine = await createRoutine({ creatorId, isPublic, name, goal });
-    res.send(routine);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Update a routine, notably change public/private, the name, or the goal
-// Requires logged in user to be the creator of the routine
-// PATCH /api/routines/:routineId
-routinesRouter.patch("/api/routines/:routineId", async (req, res, next) => {
-  try {
-    const { routineId } = req.params;
-    const { name, goal, isPublic } = req.body;
-    const { id: creatorId } = req.user;
-    const routine = await updateRoutine({
-      id: routineId,
-      creatorId,
+    const newRoutine = await createRoutine({
+      creatorId: id,
+      isPublic,
       name,
       goal,
-      isPublic,
     });
-    res.send(routine);
+    res.send(newRoutine);
   } catch (error) {
     next(error);
   }
 });
 
-// Hard delete a routine.
-// Make sure to delete all the routineActivities whose routine is the one being deleted.
-// Requires logged in user to be the creator of the routine
+// PATCH /api/routines/:routineId
+routinesRouter.patch("/:routineId", async (req, res, next) => {
+  const { isPublic, name, goal } = req.body;
+  const id = req.params.routineId;
+
+  try {
+    const originalRoutine = await getRoutineById(id);
+
+    if (!originalRoutine) {
+      next({
+        error: "error",
+        name: "NoRoutineFoundError",
+        message: `Routine ${id} not found`,
+      });
+    } else if (req.user && originalRoutine.creatorId !== req.user.id) {
+      next(
+        res.status(403).send({
+          error: "notOwnerOfRoutineError",
+          message: `User ${req.user.username} is not the owner of the routine`,
+          name: name,
+        })
+      );
+    } else {
+      const updatedRoutine = await updateRoutine({
+        id,
+        isPublic,
+        name,
+        goal,
+      });
+      res.send(updatedRoutine);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 // DELETE /api/routines/:routineId
-routinesRouter.delete("/api/routines/:routineId", async (req, res, next) => {
+routinesRouter.delete("/:routineId", async (req, res, next) => {
   try {
     const { routineId } = req.params;
     const { id: creatorId } = req.user;
     const routine = await destroyRoutine(routineId, creatorId);
     res.send(routine);
   } catch (error) {
+    console.log("There was an error deleting a routine: ", error);
     next(error);
   }
 });
 
-// Attach a single activity to a routine. Prevent duplication on (routineId, activityId) pair.
 // POST /api/routines/:routineId/activities
-routinesRouter.post(
-  "/api/routines/:routineId/activities",
-  async (req, res, next) => {
-    try {
-      const { routineId } = req.params;
-      const { activityId, count, duration } = req.body;
-      const routineActivity = await addActivityToRoutine({
-        routineId,
-        activityId,
-        count,
-        duration,
-      });
-      res.send(routineActivity);
-    } catch (error) {
-      next(error);
-    }
+routinesRouter.post("/:routineId/activities", async (req, res, next) => {
+  try {
+    const { routineId } = req.params;
+    const { activityId, count, duration } = req.body;
+    const routineActivity = await addActivityToRoutine({
+      routineId,
+      activityId,
+      count,
+      duration,
+    });
+    res.send(routineActivity);
+  } catch (error) {
+    console.log("There was an error adding an activity to a routine: ", error);
+    next(error);
   }
-);
+});
 
 module.exports = routinesRouter;
