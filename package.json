@@ -27,7 +27,6 @@
   "bugs": {
     "url": "https://github.com/wallacepreston/fitnesstrackr/issues"
   },
-  "homepage": "https://github.com/wallacepreston/fitnesstrackr#readme",
   "devDependencies": {
     "eslint": "^8.2.0",
     "eslint-plugin-jest": "^25.2.4",
